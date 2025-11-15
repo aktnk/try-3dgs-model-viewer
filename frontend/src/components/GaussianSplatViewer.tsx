@@ -29,6 +29,12 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
       mouse: new pc.Mouse(canvasRef.current),
       touch: new pc.TouchDevice(canvasRef.current),
       keyboard: new pc.Keyboard(window),
+      graphicsDeviceOptions: {
+        antialias: false,
+        alpha: false,
+        preserveDrawingBuffer: false,
+        preferWebGl2: true,
+      },
     });
 
     appRef.current = app;
