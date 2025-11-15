@@ -9,12 +9,13 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./backend:/app
-      - ./uploads:/app/../uploads
-      - /app/node_modules
+      - ./uploads:/uploads
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - UPLOADS_DIR=/uploads
+    networks:
+      - app-network
     restart: unless-stopped
 
   frontend:
@@ -26,6 +27,8 @@ services:
       - "5173:80"
     depends_on:
       - backend
+    networks:
+      - app-network
     restart: unless-stopped
 
   nginx:
@@ -38,7 +41,13 @@ services:
     depends_on:
       - backend
       - frontend
+    networks:
+      - app-network
     restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   uploads:
