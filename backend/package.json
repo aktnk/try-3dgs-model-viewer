@@ -1,0 +1,20 @@
+{
+  "name": "try-3dgs-model-viewer-backend",
+  "version": "1.0.0",
+  "description": "Backend API for 3D Gaussian Splatting Model Viewer",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["3dgs", "gaussian-splatting", "viewer", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7",
+    "multer": "^2.0.2",
+    "cors": "^2.8.5"
+  }
+}
