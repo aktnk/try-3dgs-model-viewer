@@ -47,23 +47,8 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
     camera.setPosition(0, 0, 5);
     app.root.addChild(camera);
 
-    // ライトの作成
-    const light = new pc.Entity('light');
-    light.addComponent('light', {
-      type: 'directional',
-      color: new pc.Color(1, 1, 1),
-      intensity: 1,
-    });
-    light.setEulerAngles(45, 45, 0);
-    app.root.addChild(light);
-
-    // アンビエントライト
-    const ambientLight = new pc.Entity('ambientLight');
-    ambientLight.addComponent('light', {
-      type: 'ambient',
-      color: new pc.Color(0.3, 0.3, 0.3),
-    });
-    app.root.addChild(ambientLight);
+    // シーンのアンビエントライトを設定（グローバル設定）
+    app.scene.ambientLight = new pc.Color(0.4, 0.4, 0.4);
 
     // OrbitCameraの初期化
     const orbitCamera = new OrbitCamera(camera, new pc.Vec3(0, 0, 0));
