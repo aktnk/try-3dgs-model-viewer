@@ -86,10 +86,8 @@ class OrbitCamera {
 
     if (this.isPanning) {
       // パン（ターゲット位置の移動）
-      const right = new pc.Vec3();
-      const up = new pc.Vec3();
-      this.camera.right.clone(right);
-      this.camera.up.clone(up);
+      const right = this.camera.right.clone();
+      const up = this.camera.up.clone();
 
       right.mulScalar(-deltaX * this.panSpeed * this.distance);
       up.mulScalar(deltaY * this.panSpeed * this.distance);
