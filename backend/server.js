@@ -16,7 +16,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 静的ファイル配信（アップロードされたファイル）
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsDir));
 
 // APIルート
 app.use('/api/models', modelsRouter);

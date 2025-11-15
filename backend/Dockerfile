@@ -9,6 +9,9 @@ RUN npm install --production
 # アプリケーションファイルのコピー
 COPY . .
 
+# アップロードディレクトリの作成
+RUN mkdir -p /uploads/models /uploads/thumbnails
+
 # ポート公開
 EXPOSE 3000
 

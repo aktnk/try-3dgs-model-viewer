@@ -9,10 +9,13 @@ const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
+// アップロードディレクトリのパス（Docker対応）
+const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, '../../uploads');
+
 // Multer設定 - 3DGSモデルファイル用
 const modelStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../../uploads/models'));
+    cb(null, path.join(uploadsDir, 'models'));
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -23,7 +26,7 @@ const modelStorage = multer.diskStorage({
 // Multer設定 - サムネイル用
 const thumbnailStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../../uploads/thumbnails'));
+    cb(null, path.join(uploadsDir, 'thumbnails'));
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
