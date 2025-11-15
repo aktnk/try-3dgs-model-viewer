@@ -1,4 +1,5 @@
-import sqlite3 from 'sqlite3';
+import pkg from 'sqlite3';
+const { verbose } = pkg;
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -6,7 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // SQLiteデータベース接続（詳細ログモード）
-const db = new sqlite3.verbose().Database(
+const sqlite3Verbose = verbose();
+const db = new sqlite3Verbose.Database(
   join(__dirname, '3dgs_models.sqlite'),
   (err) => {
     if (err) {
