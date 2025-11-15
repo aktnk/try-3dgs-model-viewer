@@ -112,6 +112,17 @@ docker compose up -d --build
 
 ### 方法2: ローカル環境で実行
 
+#### 初期セットアップ
+
+```bash
+# uploadsディレクトリを作成
+mkdir -p uploads/models uploads/thumbnails
+chmod -R 755 uploads
+
+# dataディレクトリに書き込み権限を付与
+chmod 755 backend/data
+```
+
 #### バックエンド
 
 ```bash
