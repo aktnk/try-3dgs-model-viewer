@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ModelList from './components/ModelList';
 import GaussianSplatViewer from './components/GaussianSplatViewer';
 import type { GaussianSplatModel } from './types/model';
