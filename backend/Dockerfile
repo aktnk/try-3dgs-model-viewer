@@ -13,6 +13,9 @@ COPY . .
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# rootユーザーとして実行（開発環境用）
+USER root
+
 # ポート公開
 EXPOSE 3000
 
