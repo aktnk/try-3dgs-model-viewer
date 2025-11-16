@@ -104,12 +104,20 @@ try-3dgs-model-viewer/
 git clone <repository-url>
 cd try-3dgs-model-viewer
 
+# 初回セットアップ（uploadsディレクトリを作成）
+./setup.sh
+
 # Docker Composeで起動
 docker compose up -d --build
 
 # アクセス
 # http://localhost:8080
 ```
+
+**注意:**
+- `setup.sh`は初回のみ実行してください。uploadsディレクトリを作成します。
+- バックエンドコンテナは起動時に自動的にディレクトリ構造と権限を設定します。
+- `setup.sh`を実行しなくても、Docker起動時に自動的にディレクトリが作成されます。
 
 ### 方法2: ローカル環境で実行
 
@@ -236,7 +244,15 @@ npm run preview  # ビルド結果をプレビュー
 
 - ファイルサイズを確認（最大500MB）
 - ネットワーク接続を確認
-- バックエンドのログを確認
+- バックエンドのログを確認: `docker compose logs backend`
+- uploadsディレクトリの権限を確認:
+  ```bash
+  # Dockerを使用している場合は、コンテナ再起動で権限が自動修正されます
+  docker compose restart backend
+
+  # ローカル環境の場合は、手動で権限を設定
+  chmod -R 755 uploads
+  ```
 
 ### Dockerコンテナが起動しない
 

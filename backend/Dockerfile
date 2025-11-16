@@ -9,11 +9,13 @@ RUN npm install --production
 # アプリケーションファイルのコピー
 COPY . .
 
-# アップロードディレクトリの作成
-RUN mkdir -p /uploads/models /uploads/thumbnails
+# エントリーポイントスクリプトをコピーして実行権限を付与
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # ポート公開
 EXPOSE 3000
 
-# サーバー起動
+# エントリーポイントとコマンドを設定
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "server.js"]

@@ -14,7 +14,14 @@ build/
 *.db
 
 # アップロードファイル
-uploads/
+uploads/*
+!uploads/.gitkeep
+!uploads/models/
+!uploads/thumbnails/
+uploads/models/*
+uploads/thumbnails/*
+!uploads/models/.gitkeep
+!uploads/thumbnails/.gitkeep
 
 # ログ
 *.log
