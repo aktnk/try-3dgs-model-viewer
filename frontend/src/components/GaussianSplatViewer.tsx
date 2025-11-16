@@ -110,7 +110,7 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
       try {
         const entity = new pc.Entity('GaussianSplat');
         entity.addComponent('gsplat', {
-          asset: asset,
+          instance: asset.resource,
         });
         app.root.addChild(entity);
 
