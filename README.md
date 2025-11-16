@@ -41,6 +41,8 @@
 
 ### インフラ
 - **Docker** & **Docker Compose** - コンテナ化
+  - バックエンド: `node:18-slim` (Debian ベース)
+  - フロントエンド: `nginx:alpine`
 - **Nginx** - リバースプロキシ
 
 ## プロジェクト構造
@@ -81,9 +83,10 @@ try-3dgs-model-viewer/
 ├── nginx/
 │   └── nginx.conf             # Nginx設定
 │
-├── uploads/                    # アップロードファイル
+├── uploads/                    # アップロードファイル（ボリュームマウント）
 │   ├── models/                # 3DGSモデル
-│   └── thumbnails/            # サムネイル
+│   ├── thumbnails/            # サムネイル
+│   └── 3dgs_models.sqlite     # SQLiteデータベース（永続化）
 │
 ├── docker-compose.yml         # Docker Compose設定
 ├── CLAUDE.md                  # AI assistant guide
@@ -267,6 +270,35 @@ docker compose restart
 docker compose down
 docker compose up -d --build
 ```
+
+### バックエンドコンテナが再起動を繰り返す
+
+バックエンドコンテナが`Restarting`状態になる場合：
+
+```bash
+# コンテナの状態を確認
+docker compose ps
+
+# バックエンドのログを確認
+docker compose logs backend
+
+# 古いイメージを削除して再ビルド
+docker compose down
+docker rmi try-3dgs-model-viewer-backend
+docker compose build --no-cache backend
+docker compose up -d
+```
+
+**原因**: sqlite3ネイティブモジュールの互換性問題の可能性があります。
+バックエンドDockerfileは`node:18-slim` (Debian ベース) を使用しています。
+Alpine Linuxベースのイメージではsqlite3がクラッシュすることがあります。
+
+### データの永続化について
+
+- uploadsディレクトリはDocker volumeとしてマウントされています
+- データベースファイル (`3dgs_models.sqlite`) もuploadsディレクトリに保存されます
+- コンテナを削除してもデータは保持されます
+- データを完全に削除する場合は `rm -rf uploads/` を実行してください
 
 ## 参考リポジトリ
 
