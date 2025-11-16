@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-slim
 
 WORKDIR /app
 
@@ -9,8 +9,9 @@ RUN npm install --production
 # アプリケーションファイルのコピー
 COPY . .
 
-# アップロードディレクトリの作成
-RUN mkdir -p /uploads/models /uploads/thumbnails
+# uploadsディレクトリをビルド時に作成
+RUN mkdir -p /uploads/models /uploads/thumbnails && \
+    chmod -R 777 /uploads
 
 # ポート公開
 EXPOSE 3000
