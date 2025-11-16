@@ -54,6 +54,7 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
     const orbitCamera = new OrbitCamera(camera, new pc.Vec3(0, 0, 0));
     orbitCamera.setDistance(5);
     orbitCamera.setAngles(-14, 45);
+    orbitCamera.saveInitialState(); // 初期状態を保存
     orbitCamera.setupMouseEvents(canvasRef.current);
     orbitCamera.setupTouchEvents(canvasRef.current);
     orbitCameraRef.current = orbitCamera;
@@ -130,6 +131,12 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
 
   }, [modelUrl, onLoadError, onLoadSuccess]);
 
+  const handleResetCamera = () => {
+    if (orbitCameraRef.current) {
+      orbitCameraRef.current.resetToInitial();
+    }
+  };
+
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <canvas
@@ -141,6 +148,14 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
           touchAction: 'none',
         }}
       />
+      {/* カメラリセットボタン */}
+      <button
+        className="reset-camera-btn"
+        onClick={handleResetCamera}
+        title="カメラを初期位置にリセット"
+      >
+        ↺ Reset Position
+      </button>
       {isLoading && (
         <div
           style={{
