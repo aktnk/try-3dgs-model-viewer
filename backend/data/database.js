@@ -6,15 +6,21 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// データベースファイルのパス（Docker対応）
+// uploadsディレクトリに配置することで、ボリュームマウントされた領域に保存され、
+// 権限問題を回避し、データの永続化も実現
+const uploadsDir = process.env.UPLOADS_DIR || join(__dirname, '../../uploads');
+const dbPath = join(uploadsDir, '3dgs_models.sqlite');
+
 // SQLiteデータベース接続（詳細ログモード）
 const sqlite3Verbose = verbose();
 const db = new sqlite3Verbose.Database(
-  join(__dirname, '3dgs_models.sqlite'),
+  dbPath,
   (err) => {
     if (err) {
       console.error('Database connection error:', err.message);
     } else {
-      console.log('Connected to SQLite database.');
+      console.log(`Connected to SQLite database at ${dbPath}`);
     }
   }
 );
