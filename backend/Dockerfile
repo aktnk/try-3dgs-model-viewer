@@ -1,7 +1,4 @@
-FROM node:18-alpine
-
-# sqlite3のビルドに必要なパッケージをインストール
-RUN apk add --no-cache python3 make g++
+FROM node:18-slim
 
 WORKDIR /app
 
