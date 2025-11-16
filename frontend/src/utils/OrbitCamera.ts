@@ -202,19 +202,39 @@ class OrbitCamera {
    */
   private updateCameraPosition(): void {
     // 度数法から弧度法に変換
-    const pitchRad = this.pitch * (Math.PI / 180);
-    const yawRad = this.yaw * (Math.PI / 180);
+    const pitchRad = this.pitch * pc.math.DEG_TO_RAD;
+    const yawRad = this.yaw * pc.math.DEG_TO_RAD;
 
     // 球面座標系でカメラ位置を計算
-    const position = new pc.Vec3();
-    position.x = this.distance * Math.sin(pitchRad + Math.PI / 2) * Math.sin(yawRad);
-    position.y = this.distance * Math.cos(pitchRad + Math.PI / 2);
-    position.z = this.distance * Math.sin(pitchRad + Math.PI / 2) * Math.cos(yawRad);
+    const x = this.target.x + this.distance * Math.sin(yawRad) * Math.cos(pitchRad);
+    const y = this.target.y + this.distance * Math.sin(pitchRad);
+    const z = this.target.z + this.distance * Math.cos(yawRad) * Math.cos(pitchRad);
 
-    position.add(this.target);
+    this.camera.setPosition(x, y, z);
 
-    this.camera.setPosition(position);
-    this.camera.lookAt(this.target);
+    // 正しいアップベクトルを計算（ジンバルロック回避のため）
+    // アップベクトルは視線方向に垂直で、カメラ空間の「上」を指す
+    // オービットカメラでは、球面座標系から導出する
+
+    // "右"ベクトルを計算（yaw回転軸に垂直）
+    const rightX = Math.cos(yawRad);
+    const rightY = 0;
+    const rightZ = -Math.sin(yawRad);
+
+    // "前方"ベクトルを計算（カメラからターゲットへ）
+    const forwardX = this.target.x - x;
+    const forwardY = this.target.y - y;
+    const forwardZ = this.target.z - z;
+
+    // アップベクトル = 前方 × 右（外積）
+    const upX = forwardY * rightZ - forwardZ * rightY;
+    const upY = forwardZ * rightX - forwardX * rightZ;
+    const upZ = forwardX * rightY - forwardY * rightX;
+
+    const up = new pc.Vec3(upX, upY, upZ).normalize();
+
+    // 計算したアップベクトルを使用してジンバルロックを回避
+    this.camera.lookAt(this.target, up);
   }
 
   /**
