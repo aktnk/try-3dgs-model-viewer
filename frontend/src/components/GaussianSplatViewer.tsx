@@ -29,12 +29,6 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
       mouse: new pc.Mouse(canvasRef.current),
       touch: new pc.TouchDevice(canvasRef.current),
       keyboard: new pc.Keyboard(window),
-      graphicsDeviceOptions: {
-        antialias: false,
-        alpha: false,
-        preserveDrawingBuffer: false,
-        preferWebGl2: true,
-      },
     });
 
     appRef.current = app;
@@ -110,7 +104,7 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
       try {
         const entity = new pc.Entity('GaussianSplat');
         entity.addComponent('gsplat', {
-          instance: asset.resource,
+          asset: asset,
         });
         app.root.addChild(entity);
 
