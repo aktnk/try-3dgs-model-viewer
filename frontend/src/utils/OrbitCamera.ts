@@ -96,7 +96,7 @@ class OrbitCamera {
       this.target.add(up);
     } else {
       // 回転
-      this.yaw -= deltaX * this.rotationSpeed;
+      this.yaw += deltaX * this.rotationSpeed;
       this.pitch -= deltaY * this.rotationSpeed;
 
       // ピッチの制限（制限値が有限の場合のみ適用）
@@ -161,7 +161,7 @@ class OrbitCamera {
       const deltaX = event.touches[0].clientX - this.lastMouseX;
       const deltaY = event.touches[0].clientY - this.lastMouseY;
 
-      this.yaw -= deltaX * this.rotationSpeed;
+      this.yaw += deltaX * this.rotationSpeed;
       this.pitch -= deltaY * this.rotationSpeed;
 
       // ピッチの制限（制限値が有限の場合のみ適用）
