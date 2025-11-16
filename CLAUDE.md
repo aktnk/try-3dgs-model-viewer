@@ -36,6 +36,9 @@ Conversations must be conducted in Japanese.
 
 ### Infrastructure
 - **Docker** & **Docker Compose** - Containerization
+  - Backend: `node:18-slim` (Debian-based, for sqlite3 compatibility)
+  - Frontend: Multi-stage build with `node:18-alpine` and `nginx:alpine`
+  - Reverse proxy: `nginx:alpine`
 - **Nginx** - Reverse proxy server
 
 ## Architecture
@@ -71,6 +74,9 @@ Conversations must be conducted in Japanese.
 - **Repository Pattern**: Data access abstraction in `models.repository.js`
 - **File Storage**: Physical files stored in `uploads/` directory
 - **Database**: SQLite for metadata storage
+  - Database file location: `/uploads/3dgs_models.sqlite`
+  - Stored in volume-mounted directory for persistence and write permissions
+  - Automatically created on first startup
 
 ## Key Components
 
@@ -220,9 +226,10 @@ try-3dgs-model-viewer/
 │   └── Dockerfile
 ├── nginx/
 │   └── nginx.conf                # Reverse proxy config
-├── uploads/
+├── uploads/                      # Volume-mounted directory
 │   ├── models/                   # 3DGS model files
-│   └── thumbnails/               # Thumbnail images
+│   ├── thumbnails/               # Thumbnail images
+│   └── 3dgs_models.sqlite        # SQLite database (persistent)
 ├── docker-compose.yml            # Container orchestration
 ├── CLAUDE.md                     # This file
 └── README.md                     # User documentation
@@ -255,6 +262,10 @@ try-3dgs-model-viewer/
 - Implement soft deletes (deleted_at field)
 - Store file paths, not file content
 - Maintain referential integrity
+- **Important**: Database file is stored in `/uploads/3dgs_models.sqlite`
+  - Uses `UPLOADS_DIR` environment variable (defaults to `uploads/`)
+  - Ensures write permissions in Docker environment
+  - Located in volume-mounted directory for data persistence
 
 ## Common Tasks
 
@@ -283,7 +294,21 @@ try-3dgs-model-viewer/
 
 ## Recent Updates
 
-### Camera Reset Feature (Latest)
+### Docker Environment Fixes (Latest)
+- **Fixed backend container crash issue** (Exit code 139)
+  - Changed base image from `node:18-alpine` to `node:18-slim` (Debian-based)
+  - Alpine Linux musl library caused sqlite3 native module to crash
+  - Debian glibc provides better compatibility for native Node.js modules
+- **Database file relocation**
+  - Moved database from `backend/data/` to `/uploads/` directory
+  - Ensures write permissions in Docker environment
+  - Enables data persistence through volume mounting
+- **Uploads directory structure**
+  - Automatically created on container startup
+  - Includes `.gitkeep` files for version control
+  - Setup script (`setup.sh`) for initial directory creation
+
+### Camera Reset Feature
 - Added reset button in GaussianSplatViewer component
 - Implemented `saveInitialState()` and `resetToInitial()` in OrbitCamera
 - Button positioned at bottom-right of viewer
@@ -293,6 +318,77 @@ try-3dgs-model-viewer/
 - Fixed pitch direction rotation
 - Made mouse/touch drag rotation more intuitive
 - Improved responsiveness of camera movements
+
+## Docker Troubleshooting
+
+### Backend Container Keeps Restarting
+
+**Symptoms**:
+- Container status shows `Restarting` in `docker compose ps`
+- Exit code 139 (segmentation fault)
+- Server logs show successful startup but then crash
+
+**Common Causes**:
+1. **sqlite3 native module crash on Alpine Linux**
+   - Alpine uses musl libc instead of glibc
+   - Native Node.js modules may not be compatible
+   - **Solution**: Use `node:18-slim` (Debian-based) instead of `node:18-alpine`
+
+2. **File permission issues**
+   - Cannot write to database file
+   - Cannot create files in uploads directory
+   - **Solution**: Ensure database is in volume-mounted `/uploads` directory
+
+3. **Old Docker image cache**
+   - Docker using outdated image despite code changes
+   - **Solution**:
+     ```bash
+     docker compose down
+     docker rmi try-3dgs-model-viewer-backend
+     docker compose build --no-cache backend
+     docker compose up -d
+     ```
+
+### Database Connection Issues
+
+**Symptoms**:
+- "Database connection error" in logs
+- "SQLITE_CANTOPEN" errors
+
+**Solutions**:
+- Verify database path: Should be `/uploads/3dgs_models.sqlite`
+- Check volume mounting in `docker-compose.yml`
+- Ensure uploads directory exists with proper permissions
+- Run `./setup.sh` to create directory structure
+
+### File Upload Failures
+
+**Symptoms**:
+- "Failed to upload model" errors
+- API returns 500 errors on upload
+
+**Solutions**:
+- Check uploads directory permissions: `chmod -R 777 uploads`
+- Verify multer configuration in `backend/routes/models.js`
+- Check available disk space
+- Review backend logs: `docker compose logs backend`
+
+### Important Docker Best Practices
+
+1. **Base Image Selection**
+   - Use Debian-based images (`node:18-slim`) for backends with native modules
+   - Alpine Linux is suitable for pure JavaScript applications
+   - Consider image size vs compatibility tradeoffs
+
+2. **Volume Mounting**
+   - Always mount persistent data directories as volumes
+   - Database files should be in volume-mounted locations
+   - Use `.gitkeep` to maintain directory structure in Git
+
+3. **Build Cache**
+   - Use `--no-cache` flag when troubleshooting build issues
+   - Layer ordering matters: put frequently changing code last
+   - Leverage multi-stage builds for smaller production images
 
 ## Notes for AI Assistants
 
@@ -304,3 +400,9 @@ try-3dgs-model-viewer/
 - Update both README.md and CLAUDE.md when adding features
 - Follow the repository pattern for database operations
 - Use proper error handling for async operations
+- **Docker-specific considerations**:
+  - Backend uses `node:18-slim` (Debian) for sqlite3 compatibility
+  - Do not change to Alpine-based images without testing sqlite3
+  - Database file must remain in `/uploads/` directory for write permissions
+  - Always test Docker builds after changing Dockerfile or dependencies
+  - Use `docker compose build --no-cache` when troubleshooting build issues
