@@ -11,6 +11,14 @@ class OrbitCamera {
   private pitch: number; // 度数法
   private yaw: number;   // 度数法
 
+  // 初期状態の保存
+  private initialState = {
+    target: new pc.Vec3(0, 0, 0),
+    distance: 5,
+    pitch: 0,
+    yaw: 0
+  };
+
   private isDragging: boolean = false;
   private isPanning: boolean = false;
   private lastMouseX: number = 0;
@@ -272,6 +280,28 @@ class OrbitCamera {
     if (yaw !== undefined) this.yaw = yaw;
 
     this.updateCameraPosition();
+  }
+
+  /**
+   * 現在のカメラ状態を初期状態として保存
+   */
+  saveInitialState(): void {
+    this.initialState.target = this.target.clone();
+    this.initialState.distance = this.distance;
+    this.initialState.pitch = this.pitch;
+    this.initialState.yaw = this.yaw;
+  }
+
+  /**
+   * カメラを初期状態にリセット
+   */
+  resetToInitial(): void {
+    this.reset(
+      this.initialState.target,
+      this.initialState.distance,
+      this.initialState.pitch,
+      this.initialState.yaw
+    );
   }
 }
 
