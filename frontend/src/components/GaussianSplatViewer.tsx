@@ -106,6 +106,9 @@ const GaussianSplatViewer: React.FC<GaussianSplatViewerProps> = ({
         entity.addComponent('gsplat', {
           asset: asset,
         });
+        // Fix upside-down display issue by rotating 180 degrees on Z-axis
+        // This is a known issue with PlayCanvas gsplat component
+        entity.setEulerAngles(0, 0, 180);
         app.root.addChild(entity);
 
         setIsLoading(false);
