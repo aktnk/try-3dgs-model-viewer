@@ -6,10 +6,9 @@ echo "Setting up uploads directory structure..."
 mkdir -p /uploads/models
 mkdir -p /uploads/thumbnails
 
-# 権限設定（nodeユーザーが書き込めるようにする）
+# 権限設定（すべてのユーザーが読み書きできるようにする）
 echo "Setting permissions..."
-chown -R node:node /uploads
-chmod -R 755 /uploads
+chmod -R 777 /uploads
 
 echo "Upload directories ready!"
 echo "  - /uploads/models"
