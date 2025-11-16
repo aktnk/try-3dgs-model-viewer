@@ -26,8 +26,8 @@ class OrbitCamera {
   // 制限
   private minDistance: number = 1;
   private maxDistance: number = 100;
-  private minPitch: number = -89;
-  private maxPitch: number = 89;
+  private minPitch: number = -Infinity;
+  private maxPitch: number = Infinity;
 
   constructor(camera: pc.Entity, targetPosition: pc.Vec3 = new pc.Vec3(0, 0, 0)) {
     this.camera = camera;
@@ -96,11 +96,13 @@ class OrbitCamera {
       this.target.add(up);
     } else {
       // 回転
-      this.yaw += deltaX * this.rotationSpeed;
+      this.yaw -= deltaX * this.rotationSpeed;
       this.pitch -= deltaY * this.rotationSpeed;
 
-      // ピッチの制限
-      this.pitch = Math.max(this.minPitch, Math.min(this.maxPitch, this.pitch));
+      // ピッチの制限（制限値が有限の場合のみ適用）
+      if (isFinite(this.minPitch) && isFinite(this.maxPitch)) {
+        this.pitch = Math.max(this.minPitch, Math.min(this.maxPitch, this.pitch));
+      }
     }
 
     this.lastMouseX = event.clientX;
@@ -159,10 +161,13 @@ class OrbitCamera {
       const deltaX = event.touches[0].clientX - this.lastMouseX;
       const deltaY = event.touches[0].clientY - this.lastMouseY;
 
-      this.yaw += deltaX * this.rotationSpeed;
+      this.yaw -= deltaX * this.rotationSpeed;
       this.pitch -= deltaY * this.rotationSpeed;
 
-      this.pitch = Math.max(this.minPitch, Math.min(this.maxPitch, this.pitch));
+      // ピッチの制限（制限値が有限の場合のみ適用）
+      if (isFinite(this.minPitch) && isFinite(this.maxPitch)) {
+        this.pitch = Math.max(this.minPitch, Math.min(this.maxPitch, this.pitch));
+      }
 
       this.lastMouseX = event.touches[0].clientX;
       this.lastMouseY = event.touches[0].clientY;
