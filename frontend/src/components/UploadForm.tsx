@@ -100,7 +100,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUploadSuccess, onClose }) => 
               disabled={isUploading}
             />
             <small className="form-help">
-              対応形式: .ply、.sog、.splat（最大100MB）
+              対応形式: .ply、.sog、.splat（最大500MB）
             </small>
             {file && (
               <div className="file-info">

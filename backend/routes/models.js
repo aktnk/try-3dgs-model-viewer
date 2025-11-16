@@ -61,13 +61,13 @@ const imageFileFilter = (req, file, cb) => {
 const uploadModel = multer({
   storage: modelStorage,
   fileFilter: modelFileFilter,
-  limits: { fileSize: 100 * 1024 * 1024 } // 100MB制限
+  limits: { fileSize: 500 * 1024 * 1024 } // 500MB制限（3DGSモデルは大きい）
 });
 
 const uploadThumbnail = multer({
   storage: thumbnailStorage,
   fileFilter: imageFileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB制限
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB制限
 });
 
 /**
@@ -108,7 +108,21 @@ router.get('/:id', async (req, res) => {
  * POST /api/models
  * 新規モデルをアップロード
  */
-router.post('/', uploadModel.single('file'), async (req, res) => {
+router.post('/', (req, res, next) => {
+  uploadModel.single('file')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({
+          error: 'ファイルサイズが大きすぎます。最大500MBまでアップロード可能です。'
+        });
+      }
+      return res.status(400).json({ error: err.message });
+    } else if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
