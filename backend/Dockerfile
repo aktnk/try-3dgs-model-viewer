@@ -1,5 +1,8 @@
 FROM node:18-alpine
 
+# sqlite3のビルドに必要なパッケージをインストール
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 # 依存関係のインストール
@@ -9,16 +12,12 @@ RUN npm install --production
 # アプリケーションファイルのコピー
 COPY . .
 
-# エントリーポイントスクリプトをコピーして実行権限を付与
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-# rootユーザーとして実行（開発環境用）
-USER root
+# uploadsディレクトリをビルド時に作成
+RUN mkdir -p /uploads/models /uploads/thumbnails && \
+    chmod -R 777 /uploads
 
 # ポート公開
 EXPOSE 3000
 
-# エントリーポイントとコマンドを設定
-ENTRYPOINT ["docker-entrypoint.sh"]
+# サーバー起動
 CMD ["node", "server.js"]
